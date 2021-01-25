@@ -1,0 +1,58 @@
+---
+title: "R Notebook"
+author: eyan
+date: 25/01/2021
+output: html_notebook
+---
+```{r}
+library('tidyverse')
+```
+```{r}
+customers <- read.csv('/home/eyan/Desktop/Rio/olist_customers_dataset.csv')
+geolocation <- read.csv('/home/eyan/Desktop/Rio/olist_geolocation_dataset.csv')
+order.items <- read.csv('/home/eyan/Desktop/Rio/olist_order_items_dataset.csv')
+order.payments <- read.csv('/home/eyan/Desktop/Rio/olist_order_payments_dataset.csv')
+order.reviews <- read.csv('/home/eyan/Desktop/Rio/olist_order_reviews_dataset.csv')
+orders <- read.csv('/home/eyan/Desktop/Rio/olist_orders_dataset.csv')
+sellers <- read.csv('/home/eyan/Desktop/Rio/olist_sellers_dataset.csv')
+products <- read.csv('/home/eyan/Desktop/Rio/olist_products_dataset.csv')
+product.category <- read.csv('/home/eyan/Desktop/Rio/product_category_name_translation.csv')
+```
+```{r}
+head(customers)
+```
+```{r}
+head(orders)
+```
+```{r}
+prod <- products %>% inner_join(product.category)
+
+olist <-customers %>%
+        inner_join(orders) %>%
+        inner_join(order.items) %>%
+        inner_join(order.payments) %>%
+        inner_join(order.reviews) %>%
+        inner_join(sellers) %>%
+        inner_join(prod) # %>%
+        # inner_join(geolocation,by=c('customer_city'='geolocation_city'))
+dim(olist)
+```
+```{r}
+colSums(is.na(olist))
+```
+```{r}
+olist[rownames(na.omit(olist)),]
+# rownames(olist)
+```
+```{r}
+str(olist)
+```
+```{r}
+write.csv(olist,'olist.csv')
+```
+```{r}
+head(olist)
+```
+```{r}
+
+```
