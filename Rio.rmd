@@ -57,5 +57,5 @@ head(olist)
 load('/home/eyan/Documents/R/kira.RData')
 ```
 ```{r}
-
+univar('price',olist)
 ```
