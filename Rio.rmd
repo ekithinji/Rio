@@ -54,5 +54,8 @@ write.csv(olist,'olist.csv')
 head(olist)
 ```
 ```{r}
+load('/home/eyan/Documents/R/kira.RData')
+```
+```{r}
 
 ```
