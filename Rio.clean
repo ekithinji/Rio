@@ -1,0 +1,136 @@
+---
+title: "R Notebook"
+author: eyan
+date: 25/01/2021
+output: html_notebook
+---
+```{r}
+library('tidyverse')
+```
+
+
+```{r}
+customers <- read.csv("C:/Users/ruth/Desktop/Olist/olist_customers_dataset.csv")
+order.items <- read.csv("C:/Users/ruth/Desktop/Olist/olist_order_items_dataset.csv")
+order.payments <- read.csv("C:/Users/ruth/Desktop/Olist/olist_order_payments_dataset.csv")
+order.reviews <- read.csv("C:/Users/ruth/Desktop/Olist/olist_order_reviews_dataset.csv")
+orders <- read.csv("C:/Users/ruth/Desktop/Olist/olist_orders_dataset.csv")
+sellers <- read.csv("C:/Users/ruth/Desktop/Olist/olist_sellers_dataset.csv")
+products <- read.csv("C:/Users/ruth/Desktop/Olist/olist_products_dataset.csv")
+product.category <- read.csv("C:/Users/ruth/Desktop/Olist/product_category_name_translation.csv")
+```
+
+Changing the name of the product column
+
+```{r}
+colnames(product.category)[1] <- "product_category_name"
+head(product.category)
+```
+Joining the tables
+
+```{r}
+prod <- products %>% inner_join(product.category)
+
+olist <-customers %>%
+        inner_join(orders) %>%
+        inner_join(order.items) %>%
+        inner_join(order.payments) %>%
+        inner_join(order.reviews) %>%
+        inner_join(sellers) %>%
+        inner_join(prod) # %>%
+        # inner_join(geolocation,by=c('customer_city'='geolocation_city'))
+dim(olist)
+```
+
+looking for missing values
+
+```{r}
+colSums(is.na(olist))
+```
+Plotting for missing values
+```{r}
+library(VIM)
+aggr_plot <- aggr(olist, col=c('navyblue','red'), numbers=TRUE, sortVars=TRUE, labels=names(olist), cex.axis=.7, gap=3, ylab=c("Histogram of missing data","Pattern"))
+```
+
+Dropping the missing values
+
+```{r}
+olist[rownames(na.omit(olist)),]
+# rownames(olist)
+```
+
+Checking for duplicates
+
+```{r}
+anyDuplicated(olist)
+```
+Dropping irrelevant columns
+```{r}
+olist.copy <- olist
+colnames(olist)
+```
+```{r}
+olist <- olist.copy[,-c(1,2,3,5,6,13,14,15,18,25,23,26,28,29,31,40)]
+
+colnames(olist)
+```
+
+Save to a CSV file.
+
+```{r}
+write.csv(olist,'olist2.csv')
+```
+
+Renaming the columns that are misspelled
+
+```{r}
+colnames(olist)[19] <- "product_description_length"
+colnames(olist)[18] <- "product_name_length"
+colnames(olist)
+```
+
+Checking for outliers in the numeric columns
+
+```{r}
+#get the numeric columns
+num.col <- Filter(is.numeric, olist)
+for (i in 1:length(num.col)) {
+  boxplot(num.col[,i], main=names(num.col[i]), type="1")
+  print(i)
+}
+
+```
+
+UNIVARIATE ANALYSIS
+
+```{r}
+#Getting the general overview of the data
+summary(olist)
+```
+
+
+```{r}
+desc_stats <- data.frame(
+  min = apply(num.col, 2, min),
+  median = apply(num.col, 2, median),
+  mean_df = apply(num.col, 2, mean),
+  SD = apply(num.col, 2, sd),
+  max = apply(num.col, 2, max)
+)
+desc_stats <- round(desc_stats,1)
+head(desc_stats)
+```
+
+
+```{r}
+library(dplyr)
+library(inspectdf)
+
+inspect_cat(olist)
+```
+**common_pcnt**, the percentage of each column occupied by the most common level shown in **common.**
+
+## Bivariate Analysis visualization
+
+
