@@ -47,6 +47,7 @@ looking for missing values
 ```{r}
 colSums(is.na(olist))
 ```
+
 Plotting for missing values
 ```{r}
 library(VIM)
@@ -101,6 +102,25 @@ for (i in 1:length(num.col)) {
 }
 
 ```
+Removing outliers from selected columns
+
+```{r}
+#using the subset function
+
+olist <- subset(olist,price<=5000)
+olist <- subset(olist,payment_value<=10000)
+olist <- subset(olist,product_weight_g<=35000)
+```
+
+```{r}
+#get the numeric columns
+num.col <- olist[c(9,13,21)]
+for (i in 1:length(num.col)) {
+  boxplot(num.col[,i], main=names(num.col[i]), type="1")
+  print(i)
+}
+
+```
 
 UNIVARIATE ANALYSIS
 
@@ -111,12 +131,16 @@ summary(olist)
 
 
 ```{r}
+library(e1071)
+
 desc_stats <- data.frame(
   min = apply(num.col, 2, min),
   median = apply(num.col, 2, median),
   mean_df = apply(num.col, 2, mean),
   SD = apply(num.col, 2, sd),
-  max = apply(num.col, 2, max)
+  max = apply(num.col, 2, max),
+  kurt = apply(num.col, 2, kurtosis),
+  skew = apply(num.col,2, skewness)
 )
 desc_stats <- round(desc_stats,1)
 head(desc_stats)
@@ -133,4 +157,7 @@ inspect_cat(olist)
 
 ## Bivariate Analysis visualization
 
-
+```{r}
+library(corrplot)
+corrplot(cor(num.col))
+```
